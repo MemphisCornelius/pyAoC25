@@ -1,4 +1,5 @@
 import time
+from functools import reduce
 
 input: str = """123 328  51 64 
  45 64  387 23 
@@ -37,4 +38,42 @@ def part1():
     return (sum, end - start)
 
 
+def part2():
+    start: float = time.time()
+
+    sum: int = 0
+    lines: list[str] = input.split("\n")
+
+    for e in range(0, len(lines)):
+        if not lines[e]:
+            lines.pop(e)
+
+    nums: list[int] = []
+    for i in range(len(lines[0]) - 1, -1, -1):
+        num: str = ""
+        for line in range(0, len(lines)):
+            num += lines[line][i]
+        num = num.strip()
+        if not num:
+            continue
+        if "+" in num or "*" in num:
+            operator: str = num[-1]
+            num = num[:-1]
+            nums.append(int(num))
+            sum += calculate_row(operator, nums)
+            nums = []
+        else:
+            nums.append(int(num))
+    end: float = time.time()
+    return (sum, end - start)
+
+
+def calculate_row(operator: str, nums: list[int]):
+    if operator == "+":
+        return reduce(lambda x, y: x + y, nums)
+    else:
+        return reduce(lambda x, y: x * y, nums)
+
+
 print("Part 1: ", part1())
+print("Part 2: ", part2())
