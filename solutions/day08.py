@@ -96,4 +96,62 @@ def calcDistance(x: tuple[int, int, int], y: tuple[int, int, int]):
     return ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2) ** 0.5
 
 
+def part2():
+    start: float = time.time()
+    boxes: list[tuple[int, int, int]] = parseInput()
+    box_with_circuit: dict[tuple[int, int, int], int] = dict(
+        zip(boxes, range(0, len(boxes)))
+    )
+    pairs: list[tuple[tuple[int, int, int], tuple[int, int, int]]] = [
+        (x, y) for x in boxes for y in boxes if x != y
+    ]
+
+    pairs_cleand: set[tuple[tuple[int, int, int], tuple[int, int, int]]] = set()
+
+    for x, y in pairs:
+        if (y, x) in pairs_cleand:
+            continue
+        pairs_cleand.add((x, y))
+
+    pairs_with_distance: list[
+        tuple[float, tuple[tuple[int, int, int], tuple[int, int, int]]]
+    ] = [(calcDistance(x, y), (x, y)) for (x, y) in pairs_cleand]
+
+    pairs_with_distance.sort()
+
+    i: int = 0
+    while True:
+        i += 1
+        (_, (x, y)) = pairs_with_distance[i]
+
+        circuit_x: int = box_with_circuit[x]
+        circuit_y: int = box_with_circuit[y]
+        if circuit_x == circuit_y:
+            continue
+
+        min_circuit: int = min(circuit_x, circuit_y)
+        max_circuit: int = max(circuit_x, circuit_y)
+
+        for box in box_with_circuit:
+            if box_with_circuit[box] == max_circuit:
+                box_with_circuit[box] = min_circuit
+
+        if all_in_same_circuit(box_with_circuit):
+            ans: int = x[0] * y[0]
+            end: float = time.time()
+            return (ans, end - start)
+
+    end = time.time()
+    return (_, end - start)
+
+
+def all_in_same_circuit(bc: dict[tuple[int, int, int], int]):
+    first_circuit: int = bc[list(bc)[0]]
+    for b in bc:
+        if bc[b] != first_circuit:
+            return False
+    return True
+
+
 print("Part 1: ", part1())
+print("Part 2: ", part2())
