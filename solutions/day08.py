@@ -1,4 +1,5 @@
 import time
+import heapq
 
 input: str = """162,817,812
 57,618,57
@@ -55,10 +56,10 @@ def part1():
         tuple[float, tuple[tuple[int, int, int], tuple[int, int, int]]]
     ] = [(calcDistance(x, y), (x, y)) for (x, y) in pairs_cleand]
 
-    pairs_with_distance.sort()
+    heapq.heapify(pairs_with_distance)
 
     for i in range(1000):
-        (_, (x, y)) = pairs_with_distance[i]
+        (_, (x, y)) = heapq.heappop(pairs_with_distance)
 
         circuit_x: int = box_with_circuit[x]
         circuit_y: int = box_with_circuit[y]
@@ -93,7 +94,7 @@ def part1():
 
 
 def calcDistance(x: tuple[int, int, int], y: tuple[int, int, int]):
-    return ((x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2) ** 0.5
+    return (x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2
 
 
 def part2():
@@ -117,24 +118,19 @@ def part2():
         tuple[float, tuple[tuple[int, int, int], tuple[int, int, int]]]
     ] = [(calcDistance(x, y), (x, y)) for (x, y) in pairs_cleand]
 
-    pairs_with_distance.sort()
+    heapq.heapify(pairs_with_distance)
 
-    i: int = 0
     while True:
-        i += 1
-        (_, (x, y)) = pairs_with_distance[i]
+        (_, (x, y)) = heapq.heappop(pairs_with_distance)
 
         circuit_x: int = box_with_circuit[x]
         circuit_y: int = box_with_circuit[y]
         if circuit_x == circuit_y:
             continue
 
-        min_circuit: int = min(circuit_x, circuit_y)
-        max_circuit: int = max(circuit_x, circuit_y)
-
         for box in box_with_circuit:
-            if box_with_circuit[box] == max_circuit:
-                box_with_circuit[box] = min_circuit
+            if box_with_circuit[box] == max(circuit_x, circuit_y):
+                box_with_circuit[box] = min(circuit_x, circuit_y)
 
         if all_in_same_circuit(box_with_circuit):
             ans: int = x[0] * y[0]
