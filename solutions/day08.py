@@ -41,6 +41,11 @@ def part1():
     box_with_circuit: dict[tuple[int, int, int], int] = dict(
         zip(boxes, range(0, len(boxes)))
     )
+    circuit_with_boxes: dict[int, set[tuple[int, int, int]]] = {}
+
+    for box in box_with_circuit:
+        circuit_with_boxes[box_with_circuit[box]] = {box}
+
     pairs: list[tuple[tuple[int, int, int], tuple[int, int, int]]] = [
         (x, y) for x in boxes for y in boxes if x != y
     ]
@@ -69,17 +74,15 @@ def part1():
         min_circuit: int = min(circuit_x, circuit_y)
         max_circuit: int = max(circuit_x, circuit_y)
 
-        for box in box_with_circuit:
-            if box_with_circuit[box] == max_circuit:
-                box_with_circuit[box] = min_circuit
+        for box_in_circuit in circuit_with_boxes[max_circuit]:
+            box_with_circuit[box_in_circuit] = min_circuit
+            circuit_with_boxes[min_circuit].add(box_in_circuit)
+        circuit_with_boxes[max_circuit] = set()
 
     circuit_sizes: dict[int, int] = {}
 
-    for box in box_with_circuit:
-        if box_with_circuit[box] not in circuit_sizes:
-            circuit_sizes[box_with_circuit[box]] = 1
-        else:
-            circuit_sizes[box_with_circuit[box]] += 1
+    for curcuit in circuit_with_boxes:
+        circuit_sizes[curcuit] = len(circuit_with_boxes[curcuit])
 
     sorted_circuit_sizes: list[int] = list(
         dict(sorted(circuit_sizes.items(), key=lambda item: item[1])).values()
@@ -103,6 +106,11 @@ def part2():
     box_with_circuit: dict[tuple[int, int, int], int] = dict(
         zip(boxes, range(0, len(boxes)))
     )
+    circuit_with_boxes: dict[int, set[tuple[int, int, int]]] = {}
+
+    for box in box_with_circuit:
+        circuit_with_boxes[box_with_circuit[box]] = {box}
+
     pairs: list[tuple[tuple[int, int, int], tuple[int, int, int]]] = [
         (x, y) for x in boxes for y in boxes if x != y
     ]
@@ -128,9 +136,13 @@ def part2():
         if circuit_x == circuit_y:
             continue
 
-        for box in box_with_circuit:
-            if box_with_circuit[box] == max(circuit_x, circuit_y):
-                box_with_circuit[box] = min(circuit_x, circuit_y)
+        min_circuit: int = min(circuit_x, circuit_y)
+        max_circuit: int = max(circuit_x, circuit_y)
+
+        for box_in_circuit in circuit_with_boxes[max_circuit]:
+            box_with_circuit[box_in_circuit] = min_circuit
+            circuit_with_boxes[min_circuit].add(box_in_circuit)
+        circuit_with_boxes[max_circuit] = set()
 
         if all_in_same_circuit(box_with_circuit):
             ans: int = x[0] * y[0]
