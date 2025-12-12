@@ -37,4 +37,12 @@ def part1():
     return (m, end-start)
 
 
+def part2():
+    coordinates = parse_input()
+    pairs: list[tuple[tuple[int, int], tuple[int, int]]] = [
+        (x, y) for x in coordinates for y in coordinates if x != y]
+    lines: list[tuple[tuple[int, int], tuple[int, int]]] = [
+        (x, y) for (x, y) in pairs if x[0] == y[0] or x[1] == y[1]]
+
+
 print("Part 1: ", part1())
